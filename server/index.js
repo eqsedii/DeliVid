@@ -20,9 +20,9 @@ const supabase = createClient(
 );
 
 const FONT_URLS = {
-  "sans-serif": "https://cdn.jsdelivr.net/gh/google/fonts/apache/roboto/static/Roboto-Regular.ttf",
-  "serif": "https://cdn.jsdelivr.net/gh/google/fonts/ofl/merriweather/static/Merriweather-Regular.ttf",
-  "monospace": "https://cdn.jsdelivr.net/gh/google/fonts/apache/robotomono/static/RobotoMono-Regular.ttf",
+  "sans-serif": "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Regular.ttf",
+  "serif": "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/merriweather/static/Merriweather-Regular.ttf",
+  "monospace": "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/robotomono/static/RobotoMono-Regular.ttf",
 };
 
 async function downloadTo(url, destPath) {
