@@ -9,6 +9,7 @@ export default function CreatePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [title, setTitle] = useState("My Video");
+  const [overlayText, setOverlayText] = useState("");
   const [font, setFont] = useState("sans-serif");
   const [fontSize, setFontSize] = useState(48);
   const [fontColor, setFontColor] = useState("#ffffff");
@@ -25,8 +26,12 @@ export default function CreatePage() {
 
   const generateAiBackground = () => {
     if (!aiPrompt) return;
-    const encoded = encodeURIComponent(aiPrompt);
-    setBgUrl(`https://image.pollinations.ai/prompt/${encoded}?width=1280&height=720&nologo=true`);
+    const enhanced = `${aiPrompt}, high quality, detailed, cinematic lighting, 4k`;
+    const encoded = encodeURIComponent(enhanced);
+    const seed = Math.floor(Math.random() * 100000);
+    setBgUrl(
+      `https://image.pollinations.ai/prompt/${encoded}?width=1280&height=720&nologo=true&model=flux&seed=${seed}`
+    );
   };
 
   const handleSubmit = async () => {
@@ -54,6 +59,7 @@ export default function CreatePage() {
       .insert({
         user_id: userId,
         title,
+        overlay_text: overlayText,
         audio_url: audioPublicUrl.publicUrl,
         background_url: bgUrl || null,
         font,
@@ -101,6 +107,14 @@ export default function CreatePage() {
         accept="audio/*"
         onChange={(e) => setAudioFile(e.target.files?.[0] || null)}
         className="w-full mb-5 text-sm"
+      />
+
+      <label className="block mb-2 text-sm text-gray-400">Text to display on video</label>
+      <input
+        value={overlayText}
+        onChange={(e) => setOverlayText(e.target.value)}
+        placeholder="e.g. Episode 1 - The Beginning"
+        className="w-full p-3 mb-5 rounded-lg bg-gray-800 border border-gray-700"
       />
 
       <label className="block mb-2 text-sm text-gray-400">
