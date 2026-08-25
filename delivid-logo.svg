@@ -1,0 +1,28 @@
+<svg width="480" height="140" viewBox="0 0 480 140" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6D5EF6"/>
+      <stop offset="55%" stop-color="#B15CF6"/>
+      <stop offset="100%" stop-color="#FF6E6E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Mark: waveform dissolving into a rounded video frame with a play triangle -->
+  <g transform="translate(10,20)">
+    <rect x="0" y="0" width="100" height="100" rx="26" fill="#14141c"/>
+    <rect x="0" y="0" width="100" height="100" rx="26" fill="none" stroke="url(#grad)" stroke-width="3"/>
+
+    <!-- waveform bars, left side, fading as they approach the play shape -->
+    <rect x="14" y="40" width="6" height="20" rx="3" fill="url(#grad)"/>
+    <rect x="24" y="30" width="6" height="40" rx="3" fill="url(#grad)"/>
+    <rect x="34" y="46" width="6" height="8" rx="3" fill="url(#grad)" opacity="0.85"/>
+
+    <!-- play triangle, the "video" resolution of the waveform -->
+    <path d="M50 26 L82 50 L50 74 Z" fill="url(#grad)"/>
+  </g>
+
+  <!-- Wordmark -->
+  <g transform="translate(128,0)">
+    <text x="0" y="88" font-family="'Poppins','Segoe UI',sans-serif" font-weight="700" font-size="58" fill="#F5F5F7" letter-spacing="-1">Deli<tspan fill="url(#grad)">Vid</tspan></text>
+  </g>
+</svg>
