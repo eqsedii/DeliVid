@@ -57,13 +57,13 @@ app.post("/render", async (req, res) => {
 
     if (project.background_url) {
       await downloadTo(project.background_url, bgPath);
-    } else {
-      // fallback: solid dark background, generated with ffmpeg itself
     }
 
     await downloadTo(FONT_URLS[project.font] || FONT_URLS["sans-serif"], fontPath);
 
-    const safeText = (project.title || "").replace(/:/g, "\\:").replace(/'/g, "\\'");
+    const safeText = (project.overlay_text || project.title || "")
+      .replace(/:/g, "\\:")
+      .replace(/'/g, "\\'");
 
     await new Promise((resolve, reject) => {
       let cmd = ffmpeg();
