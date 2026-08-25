@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import Splash from "@/components/Splash";
 
 export const metadata: Metadata = {
   title: "DeliVid — Audio to Video",
@@ -15,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Splash />
         <Navbar />
         {children}
       </body>
