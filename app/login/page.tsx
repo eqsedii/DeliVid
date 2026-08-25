@@ -1,0 +1,81 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+
+export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) setError(error.message);
+      else router.push("/create");
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) setError(error.message);
+      else router.push("/create");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center px-6">
+      <h1 className="text-3xl font-bold mb-6">
+        {isSignUp ? "Create your account" : "Welcome back"}
+      </h1>
+
+      <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 outline-none"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={6}
+          className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 outline-none"
+        />
+
+        {error && <p className="text-red-400 text-sm">{error}</p>}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-white text-black p-3 rounded-lg font-semibold hover:bg-gray-200 transition disabled:opacity-50"
+        >
+          {loading ? "Please wait..." : isSignUp ? "Sign Up" : "Sign In"}
+        </button>
+      </form>
+
+      <button
+        onClick={() => setIsSignUp(!isSignUp)}
+        className="mt-4 text-sm text-gray-400 underline"
+      >
+        {isSignUp
+          ? "Already have an account? Sign in"
+          : "No account? Sign up"}
+      </button>
+    </main>
+  );
+}
