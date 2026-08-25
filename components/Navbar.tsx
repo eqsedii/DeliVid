@@ -24,7 +24,9 @@ export default function Navbar() {
 
   return (
     <nav className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
-      <Link href="/" className="font-bold text-lg">DeliVid</Link>
+      <Link href="/" className="flex items-center">
+        <img src="/logo.svg" alt="DeliVid" className="h-9" />
+      </Link>
       <div className="flex items-center gap-4 text-sm">
         {loggedIn ? (
           <>
