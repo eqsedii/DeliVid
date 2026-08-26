@@ -1,8 +1,9 @@
 "use client";
-import LogoSpinner from "@/components/LogoSpinner";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import LogoSpinner from "@/components/LogoSpinner";
 
 export default function CreatePage() {
   const router = useRouter();
@@ -90,107 +91,122 @@ export default function CreatePage() {
     }
   };
 
+  const inputClass =
+    "w-full p-3 rounded-xl bg-[#14141c] border border-[#24242e] outline-none focus:border-[#B15CF6] transition text-white";
+
   return (
     <main className="min-h-screen px-6 py-10 max-w-xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Create a Video</h1>
+      <h1 className="text-4xl font-extrabold mb-8">
+        Create a <span className="gradient-text">Video</span>
+      </h1>
 
-      <label className="block mb-2 text-sm text-gray-400">Project title</label>
-      <input
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="w-full p-3 mb-5 rounded-lg bg-gray-800 border border-gray-700"
-      />
+      <div className="card p-6 space-y-6">
+        <div>
+          <label className="block mb-2 text-sm text-gray-400">Project title</label>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className={inputClass}
+          />
+        </div>
 
-      <label className="block mb-2 text-sm text-gray-400">Upload audio</label>
-      <input
-        type="file"
-        accept="audio/*"
-        onChange={(e) => setAudioFile(e.target.files?.[0] || null)}
-        className="w-full mb-5 text-sm"
-      />
+        <div>
+          <label className="block mb-2 text-sm text-gray-400">Upload audio</label>
+          <input
+            type="file"
+            accept="audio/*"
+            onChange={(e) => setAudioFile(e.target.files?.[0] || null)}
+            className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-semibold file:gradient-btn file:text-white"
+          />
+        </div>
 
-      <label className="block mb-2 text-sm text-gray-400">Text to display on video</label>
-      <input
-        value={overlayText}
-        onChange={(e) => setOverlayText(e.target.value)}
-        placeholder="e.g. Episode 1 - The Beginning"
-        className="w-full p-3 mb-5 rounded-lg bg-gray-800 border border-gray-700"
-      />
+        <div>
+          <label className="block mb-2 text-sm text-gray-400">Text to display on video</label>
+          <input
+            value={overlayText}
+            onChange={(e) => setOverlayText(e.target.value)}
+            placeholder="e.g. Episode 1 - The Beginning"
+            className={inputClass}
+          />
+        </div>
 
-      <label className="block mb-2 text-sm text-gray-400">
-        AI background — describe an image
-      </label>
-      <div className="flex gap-2 mb-3">
-        <input
-          value={aiPrompt}
-          onChange={(e) => setAiPrompt(e.target.value)}
-          placeholder="e.g. calm blue ocean sunset"
-          className="flex-1 p-3 rounded-lg bg-gray-800 border border-gray-700"
-        />
+        <div>
+          <label className="block mb-2 text-sm text-gray-400">
+            AI background — describe an image
+          </label>
+          <div className="flex gap-2">
+            <input
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder="e.g. calm blue ocean sunset"
+              className={inputClass}
+            />
+            <button
+              onClick={generateAiBackground}
+              className="px-5 rounded-xl gradient-btn font-semibold whitespace-nowrap"
+            >
+              Generate
+            </button>
+          </div>
+          {bgUrl && (
+            <img src={bgUrl} alt="background preview" className="w-full rounded-xl mt-3" />
+          )}
+        </div>
+
+        <div>
+          <label className="block mb-2 text-sm text-gray-400">Font</label>
+          <select
+            value={font}
+            onChange={(e) => setFont(e.target.value)}
+            className={inputClass}
+          >
+            <option value="sans-serif">Sans Serif</option>
+            <option value="serif">Serif</option>
+            <option value="monospace">Monospace</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block mb-2 text-sm text-gray-400">Font size: {fontSize}px</label>
+          <input
+            type="range"
+            min={24}
+            max={96}
+            value={fontSize}
+            onChange={(e) => setFontSize(Number(e.target.value))}
+            className="w-full accent-[#B15CF6]"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-2 text-sm text-gray-400">Font color</label>
+          <input
+            type="color"
+            value={fontColor}
+            onChange={(e) => setFontColor(e.target.value)}
+            className="w-full h-12 rounded-xl bg-[#14141c] border border-[#24242e]"
+          />
+        </div>
+
         <button
-          onClick={generateAiBackground}
-          className="px-4 rounded-lg bg-indigo-600 font-semibold"
+          onClick={handleSubmit}
+          disabled={!audioFile || !!status}
+          className={`w-full flex items-center justify-center gap-2 text-white p-3 rounded-xl font-semibold transition gradient-btn disabled:opacity-40 ${
+            status ? "glow-btn" : ""
+          }`}
         >
-          Generate
+          {status ? (
+            <>
+              <LogoSpinner size={18} />
+              Working...
+            </>
+          ) : (
+            "Generate Video"
+          )}
         </button>
+
+        {status && <p className="text-sm text-gray-400">{status}</p>}
       </div>
-      {bgUrl && (
-        <img src={bgUrl} alt="background preview" className="w-full rounded-lg mb-5" />
-      )}
-
-      <label className="block mb-2 text-sm text-gray-400">Font</label>
-      <select
-        value={font}
-        onChange={(e) => setFont(e.target.value)}
-        className="w-full p-3 mb-5 rounded-lg bg-gray-800 border border-gray-700"
-      >
-        <option value="sans-serif">Sans Serif</option>
-        <option value="serif">Serif</option>
-        <option value="monospace">Monospace</option>
-      </select>
-
-      <label className="block mb-2 text-sm text-gray-400">Font size: {fontSize}px</label>
-      <input
-        type="range"
-        min={24}
-        max={96}
-        value={fontSize}
-        onChange={(e) => setFontSize(Number(e.target.value))}
-        className="w-full mb-5"
-      />
-
-      <label className="block mb-2 text-sm text-gray-400">Font color</label>
-      <input
-        type="color"
-        value={fontColor}
-        onChange={(e) => setFontColor(e.target.value)}
-        className="w-full h-12 mb-6 rounded-lg bg-gray-800 border border-gray-700"
-      />
-<button
-  onClick={handleSubmit}
-  disabled={!audioFile || !!status}
-  className={`w-full flex items-center justify-center gap-2 text-white p-3 rounded-lg font-semibold transition gradient-btn disabled:opacity-40 ${
-    status ? "glow-btn" : ""
-  }`}
->
-  {status ? (
-    <>
-      <LogoSpinner size={18} />
-      Working...
-    </>
-  ) : (
-    "Generate Video"
-  )}
-</button>
-      <button
-        onClick={handleSubmit}
-        disabled={!audioFile}
-        className="w-full bg-white text-black p-3 rounded-lg font-semibold disabled:opacity-40"
-      >
-        Generate Video
-      </button>
-
-      {status && <p className="mt-4 text-sm text-gray-400">{status}</p>}
     </main>
   );
-}
+                  }
