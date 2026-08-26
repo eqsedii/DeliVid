@@ -19,11 +19,11 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
-const FONT_URLS = {
-  "sans-serif": "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Regular.ttf",
-  "serif": "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/merriweather/static/Merriweather-Regular.ttf",
-  "monospace": "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/robotomono/static/RobotoMono-Regular.ttf",
-};
+// Bundled locally via npm — no network download needed, can't 404
+const FONT_PATH = path.join(
+  __dirname,
+  "node_modules/roboto-fontface/fonts/roboto/Roboto-Regular.ttf"
+);
 
 async function downloadTo(url, destPath) {
   const res = await fetch(url);
@@ -42,7 +42,6 @@ app.post("/render", async (req, res) => {
   const tmp = os.tmpdir();
   const audioPath = path.join(tmp, `${projectId}-audio`);
   const bgPath = path.join(tmp, `${projectId}-bg.jpg`);
-  const fontPath = path.join(tmp, `${projectId}-font.ttf`);
   const outPath = path.join(tmp, `${projectId}-out.mp4`);
 
   try {
@@ -58,8 +57,6 @@ app.post("/render", async (req, res) => {
     if (project.background_url) {
       await downloadTo(project.background_url, bgPath);
     }
-
-    await downloadTo(FONT_URLS[project.font] || FONT_URLS["sans-serif"], fontPath);
 
     const safeText = (project.overlay_text || project.title || "")
       .replace(/:/g, "\\:")
@@ -77,7 +74,7 @@ app.post("/render", async (req, res) => {
       cmd
         .input(audioPath)
         .complexFilter([
-          `[0:v]scale=1280:720,drawtext=fontfile='${fontPath}':text='${safeText}':fontcolor=${project.font_color.replace(
+          `[0:v]scale=1280:720,drawtext=fontfile='${FONT_PATH}':text='${safeText}':fontcolor=${project.font_color.replace(
             "#",
             "0x"
           )}:fontsize=${project.font_size}:x=(w-text_w)/2:y=(h-text_h)/2[v]`,
@@ -116,7 +113,7 @@ app.post("/render", async (req, res) => {
     console.error(err);
     await supabase.from("projects").update({ status: "failed" }).eq("id", projectId);
   } finally {
-    [audioPath, bgPath, fontPath, outPath].forEach((f) => {
+    [audioPath, bgPath, outPath].forEach((f) => {
       if (fs.existsSync(f)) fs.unlinkSync(f);
     });
   }
