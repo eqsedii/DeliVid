@@ -39,3 +39,16 @@ body {
 .animate-splash .bar2 { animation-delay: 0.1s; }
 .animate-splash .bar3 { animation-delay: 0.2s; }
 .animate-splash .play { transform-origin: center; animation: popIn 0.5s ease-out 0.3s both; }
+@keyframes lsPulse {
+  0%, 100% { transform: scaleY(1); opacity: 1; }
+  50% { transform: scaleY(0.4); opacity: 0.5; }
+}
+@keyframes lsPlayFade {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+.ls-bar { transform-origin: center; animation: lsPulse 0.7s ease-in-out infinite; }
+.ls-bar1 { animation-delay: 0s; }
+.ls-bar2 { animation-delay: 0.12s; }
+.ls-bar3 { animation-delay: 0.24s; }
+.ls-play { transform-origin: center; animation: lsPlayFade 0.9s ease-in-out infinite; }
