@@ -52,3 +52,19 @@ body {
 .ls-bar2 { animation-delay: 0.12s; }
 .ls-bar3 { animation-delay: 0.24s; }
 .ls-play { transform-origin: center; animation: lsPlayFade 0.9s ease-in-out infinite; }
+.gradient-text {
+  background: linear-gradient(135deg, #6D5EF6, #B15CF6, #FF6E6E);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.gradient-btn {
+  background: linear-gradient(135deg, #6D5EF6, #B15CF6, #FF6E6E);
+}
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(177,92,246,0.5), 0 0 40px rgba(109,94,246,0.3); }
+  50% { box-shadow: 0 0 35px rgba(255,110,110,0.6), 0 0 60px rgba(177,92,246,0.4); }
+}
+.glow-btn {
+  animation: glowPulse 1.8s ease-in-out infinite;
+}
