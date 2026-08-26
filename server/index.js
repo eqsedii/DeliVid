@@ -41,8 +41,8 @@ function escapeXml(str) {
 }
 
 async function renderTextPng(text, fontSize, fontColor, outPath) {
-  const width = 1280;
-  const height = 200;
+  const width = 854;
+  const height = 140;
   const safe = escapeXml(text || "");
 
   const svg = `
@@ -59,7 +59,7 @@ async function renderTextPng(text, fontSize, fontColor, outPath) {
         x="50%"
         y="50%"
         font-family="DeliVidFont"
-        font-size="${fontSize}"
+        font-size="${Math.min(fontSize, 48)}"
         fill="${fontColor}"
         text-anchor="middle"
         dominant-baseline="middle"
@@ -109,7 +109,7 @@ app.post("/render", async (req, res) => {
       if (project.background_url) {
         cmd = cmd.input(bgPath).inputOptions(["-loop 1"]);
       } else {
-        cmd = cmd.input("color=c=0x101014:s=1280x720").inputFormat("lavfi");
+        cmd = cmd.input("color=c=0x101014:s=854x480").inputFormat("lavfi");
       }
 
       cmd
@@ -117,16 +117,18 @@ app.post("/render", async (req, res) => {
         .inputOptions(["-loop 1"])
         .input(audioPath)
         .complexFilter([
-          "[0:v]scale=1280:720[bg]",
+          "[0:v]scale=854:480[bg]",
           "[bg][1:v]overlay=(W-w)/2:(H-h)/2[v]",
         ])
         .outputOptions([
           "-map [v]",
           "-map 2:a",
           "-c:v libx264",
+          "-preset ultrafast",
+          "-threads 1",
           "-tune stillimage",
           "-c:a aac",
-          "-b:a 192k",
+          "-b:a 128k",
           "-pix_fmt yuv420p",
           "-shortest",
         ])
