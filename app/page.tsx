@@ -1,15 +1,22 @@
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
-      <h1 className="text-5xl font-bold mb-4">DeliVid</h1>
-      <p className="text-lg text-gray-400 mb-8 max-w-md">
-        Turn your audio into a beautiful video, ready for YouTube — in seconds.
+    <main className="min-h-[90vh] flex flex-col items-center justify-center px-6 text-center">
+      <span className="text-xs uppercase tracking-widest text-gray-500 mb-4">
+        Audio → Video, in seconds
+      </span>
+      <h1 className="text-5xl sm:text-6xl font-extrabold mb-5 leading-tight">
+        Turn sound into<br />
+        <span className="gradient-text">something worth watching</span>
+      </h1>
+      <p className="text-gray-400 mb-10 max-w-md">
+        Upload your audio, pick a look, and DeliVid renders a polished video —
+        ready to download or push to YouTube.
       </p>
       <a
         href="/create"
-        className="bg-white text-black px-6 py-3 rounded-full font-semibold hover:bg-gray-200 transition"
+        className="gradient-btn text-white px-8 py-4 rounded-full font-bold text-lg hover:opacity-90 transition"
       >
-        Get Started
+        Start Creating
       </a>
     </main>
   );
