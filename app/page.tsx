@@ -1,10 +1,6 @@
-import VideoBackground from "@/components/VideoBackground";
-
 export default function Home() {
   return (
     <main className="relative min-h-[92vh] flex flex-col items-center justify-center px-6 text-center overflow-hidden">
-      <VideoBackground />
-
       <img
         src="/logo.svg"
         alt="DeliVid"
