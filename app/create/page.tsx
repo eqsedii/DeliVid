@@ -166,7 +166,22 @@ export default function CreatePage() {
         onChange={(e) => setFontColor(e.target.value)}
         className="w-full h-12 mb-6 rounded-lg bg-gray-800 border border-gray-700"
       />
-
+<button
+  onClick={handleSubmit}
+  disabled={!audioFile || !!status}
+  className={`w-full flex items-center justify-center gap-2 text-white p-3 rounded-lg font-semibold transition gradient-btn disabled:opacity-40 ${
+    status ? "glow-btn" : ""
+  }`}
+>
+  {status ? (
+    <>
+      <LogoSpinner size={18} />
+      Working...
+    </>
+  ) : (
+    "Generate Video"
+  )}
+</button>
       <button
         onClick={handleSubmit}
         disabled={!audioFile}
