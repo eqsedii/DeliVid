@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Splash from "@/components/Splash";
+import VideoBackground from "@/components/VideoBackground";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -23,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={poppins.variable}>
       <body>
+        <VideoBackground />
         <Splash />
         <Navbar />
         {children}
