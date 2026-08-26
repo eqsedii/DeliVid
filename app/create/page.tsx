@@ -17,6 +17,9 @@ export default function CreatePage() {
   const [bgUrl, setBgUrl] = useState("");
   const [aiPrompt, setAiPrompt] = useState("");
   const [status, setStatus] = useState("");
+  const [projectId, setProjectId] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [polling, setPolling] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -24,6 +27,34 @@ export default function CreatePage() {
       else setUserId(data.user.id);
     });
   }, [router]);
+
+  // Poll for the finished video once we've kicked off a render
+  useEffect(() => {
+    if (!projectId || !polling) return;
+
+    const interval = setInterval(async () => {
+      const { data, error } = await supabase
+        .from("projects")
+        .select("video_url, status")
+        .eq("id", projectId)
+        .single();
+
+      if (error) return;
+
+      if (data.status === "done" && data.video_url) {
+        setVideoUrl(data.video_url);
+        setStatus("");
+        setPolling(false);
+        clearInterval(interval);
+      } else if (data.status === "failed") {
+        setStatus("Rendering failed. Please try again.");
+        setPolling(false);
+        clearInterval(interval);
+      }
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [projectId, polling]);
 
   const generateAiBackground = () => {
     if (!aiPrompt) return;
@@ -37,6 +68,7 @@ export default function CreatePage() {
 
   const handleSubmit = async () => {
     if (!audioFile || !userId) return;
+    setVideoUrl(null);
     setStatus("Uploading audio...");
 
     const audioPath = `${userId}/${Date.now()}-${audioFile.name}`;
@@ -76,7 +108,8 @@ export default function CreatePage() {
       return;
     }
 
-    setStatus("Sending to video processor...");
+    setProjectId(project.id);
+    setStatus("Rendering your video — this can take a minute...");
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/render`, {
@@ -85,7 +118,7 @@ export default function CreatePage() {
         body: JSON.stringify({ projectId: project.id }),
       });
       if (!res.ok) throw new Error("Backend error");
-      setStatus("Video is rendering! Check your history page shortly.");
+      setPolling(true);
     } catch (err) {
       setStatus("Project saved, but rendering failed to start. Try again from history.");
     }
@@ -155,11 +188,7 @@ export default function CreatePage() {
 
         <div>
           <label className="block mb-2 text-sm text-gray-400">Font</label>
-          <select
-            value={font}
-            onChange={(e) => setFont(e.target.value)}
-            className={inputClass}
-          >
+          <select value={font} onChange={(e) => setFont(e.target.value)} className={inputClass}>
             <option value="sans-serif">Sans Serif</option>
             <option value="serif">Serif</option>
             <option value="monospace">Monospace</option>
@@ -206,7 +235,31 @@ export default function CreatePage() {
         </button>
 
         {status && <p className="text-sm text-gray-400">{status}</p>}
+
+        {videoUrl && (
+          <div className="pt-4 border-t border-[#24242e] space-y-4">
+            <p className="text-sm font-semibold text-green-400">Your video is ready!</p>
+            <video src={videoUrl} controls className="w-full rounded-xl" />
+            <div className="flex gap-3 flex-wrap">
+              <a
+                href={videoUrl}
+                download
+                className="flex-1 text-center gradient-btn text-white px-4 py-3 rounded-xl font-semibold"
+              >
+                Download to Phone
+              </a>
+              <a
+                href="https://www.youtube.com/upload"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 text-center bg-red-600 text-white px-4 py-3 rounded-xl font-semibold"
+              >
+                Upload to YouTube
+              </a>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
-                  }
+            }
