@@ -4,18 +4,13 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const fetch = require("node-fetch");
+const sharp = require("sharp");
 const ffmpegPath = require("ffmpeg-static");
 const ffmpeg = require("fluent-ffmpeg");
 const { createClient } = require("@supabase/supabase-js");
 
 ffmpeg.setFfmpegPath(ffmpegPath);
-const { execSync } = require("child_process");
-try {
-  const filters = execSync(`${ffmpegPath} -filters`).toString();
-  console.log("HAS DRAWTEXT:", filters.includes("drawtext"));
-} catch (e) {
-  console.log("Filter check failed:", e.message);
-}
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -25,11 +20,11 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
-// Bundled locally via npm — no network download needed, can't 404
-const FONT_PATH = path.join(
+const FONT_FILE = path.join(
   __dirname,
   "node_modules/roboto-fontface/fonts/roboto/Roboto-Regular.ttf"
 );
+const FONT_BASE64 = fs.readFileSync(FONT_FILE).toString("base64");
 
 async function downloadTo(url, destPath) {
   const res = await fetch(url);
@@ -37,6 +32,45 @@ async function downloadTo(url, destPath) {
   const buffer = await res.buffer();
   fs.writeFileSync(destPath, buffer);
   return destPath;
+}
+
+function escapeXml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+async function renderTextPng(text, fontSize, fontColor, outPath) {
+  const width = 1280;
+  const height = 200;
+  const safe = escapeXml(text || "");
+
+  const svg = `
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>
+          @font-face {
+            font-family: 'DeliVidFont';
+            src: url(data:font/ttf;base64,${FONT_BASE64}) format('truetype');
+          }
+        </style>
+      </defs>
+      <text
+        x="50%"
+        y="50%"
+        font-family="DeliVidFont"
+        font-size="${fontSize}"
+        fill="${fontColor}"
+        text-anchor="middle"
+        dominant-baseline="middle"
+      >${safe}</text>
+    </svg>
+  `;
+
+  await sharp(Buffer.from(svg)).png().toFile(outPath);
 }
 
 app.post("/render", async (req, res) => {
@@ -48,6 +82,7 @@ app.post("/render", async (req, res) => {
   const tmp = os.tmpdir();
   const audioPath = path.join(tmp, `${projectId}-audio`);
   const bgPath = path.join(tmp, `${projectId}-bg.jpg`);
+  const textPath = path.join(tmp, `${projectId}-text.png`);
   const outPath = path.join(tmp, `${projectId}-out.mp4`);
 
   try {
@@ -64,9 +99,12 @@ app.post("/render", async (req, res) => {
       await downloadTo(project.background_url, bgPath);
     }
 
-    const safeText = (project.overlay_text || project.title || "")
-      .replace(/:/g, "\\:")
-      .replace(/'/g, "\\'");
+    await renderTextPng(
+      project.overlay_text || project.title || "",
+      project.font_size || 48,
+      project.font_color || "#ffffff",
+      textPath
+    );
 
     await new Promise((resolve, reject) => {
       let cmd = ffmpeg();
@@ -78,16 +116,16 @@ app.post("/render", async (req, res) => {
       }
 
       cmd
+        .input(textPath)
+        .inputOptions(["-loop 1"])
         .input(audioPath)
         .complexFilter([
-          `[0:v]scale=1280:720,drawtext=fontfile='${FONT_PATH}':text='${safeText}':fontcolor=${project.font_color.replace(
-            "#",
-            "0x"
-          )}:fontsize=${project.font_size}:x=(w-text_w)/2:y=(h-text_h)/2[v]`,
+          "[0:v]scale=1280:720[bg]",
+          "[bg][1:v]overlay=(W-w)/2:(H-h)/2[v]",
         ])
         .outputOptions([
           "-map [v]",
-          "-map 1:a",
+          "-map 2:a",
           "-c:v libx264",
           "-tune stillimage",
           "-c:a aac",
@@ -119,7 +157,7 @@ app.post("/render", async (req, res) => {
     console.error(err);
     await supabase.from("projects").update({ status: "failed" }).eq("id", projectId);
   } finally {
-    [audioPath, bgPath, outPath].forEach((f) => {
+    [audioPath, bgPath, textPath, outPath].forEach((f) => {
       if (fs.existsSync(f)) fs.unlinkSync(f);
     });
   }
