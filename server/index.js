@@ -9,7 +9,13 @@ const ffmpeg = require("fluent-ffmpeg");
 const { createClient } = require("@supabase/supabase-js");
 
 ffmpeg.setFfmpegPath(ffmpegPath);
-
+const { execSync } = require("child_process");
+try {
+  const filters = execSync(`${ffmpegPath} -filters`).toString();
+  console.log("HAS DRAWTEXT:", filters.includes("drawtext"));
+} catch (e) {
+  console.log("Filter check failed:", e.message);
+}
 const app = express();
 app.use(cors());
 app.use(express.json());
