@@ -29,7 +29,6 @@ export default function CreatePage() {
     });
   }, [router]);
 
-  // Poll for the finished video once we've kicked off a render
   useEffect(() => {
     if (!projectId || !polling) return;
 
@@ -58,21 +57,21 @@ export default function CreatePage() {
   }, [projectId, polling]);
 
   const generateAiBackground = () => {
-  if (!aiPrompt) return;
-  setBgLoading(true);
-  setBgUrl("");
-  const enhanced = `${aiPrompt}, high quality, detailed, cinematic lighting, 4k`;
-  const encoded = encodeURIComponent(enhanced);
-  const seed = Math.floor(Math.random() * 100000);
-  const url = `https://image.pollinations.ai/prompt/${encoded}?width=1280&height=720&nologo=true&model=flux&seed=${seed}`;
-  const img = new window.Image();
-  img.onload = () => {
-    setBgUrl(url);
-    setBgLoading(false);
+    if (!aiPrompt) return;
+    setBgLoading(true);
+    setBgUrl("");
+    const enhanced = `${aiPrompt}, high quality, detailed, cinematic lighting, 4k`;
+    const encoded = encodeURIComponent(enhanced);
+    const seed = Math.floor(Math.random() * 100000);
+    const url = `https://image.pollinations.ai/prompt/${encoded}?width=1280&height=720&nologo=true&model=flux&seed=${seed}`;
+    const img = new window.Image();
+    img.onload = () => {
+      setBgUrl(url);
+      setBgLoading(false);
+    };
+    img.onerror = () => setBgLoading(false);
+    img.src = url;
   };
-  img.onerror = () => setBgLoading(false);
-  img.src = url;
-};
 
   const handleSubmit = async () => {
     if (!audioFile || !userId) return;
@@ -183,14 +182,14 @@ export default function CreatePage() {
               className={inputClass}
             />
             <button
-  onClick={generateAiBackground}
-  disabled={bgLoading}
-  className={`px-5 rounded-xl gradient-btn font-semibold whitespace-nowrap flex items-center gap-2 disabled:opacity-60 ${
-    bgLoading ? "glow-btn" : ""
-  }`}
->
-  {bgLoading ? <LogoSpinner size={16} /> : "Generate"}
-</button>
+              onClick={generateAiBackground}
+              disabled={bgLoading}
+              className={`px-5 rounded-xl gradient-btn font-semibold whitespace-nowrap flex items-center gap-2 disabled:opacity-60 ${
+                bgLoading ? "glow-btn" : ""
+              }`}
+            >
+              {bgLoading ? <LogoSpinner size={16} /> : "Generate"}
+            </button>
           </div>
           {bgUrl && (
             <img src={bgUrl} alt="background preview" className="w-full rounded-xl mt-3" />
@@ -273,4 +272,4 @@ export default function CreatePage() {
       </div>
     </main>
   );
-            }
+}
