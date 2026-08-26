@@ -3,28 +3,39 @@
 @tailwind utilities;
 
 body {
-  background: #0f0f14;
-  color: #f5f5f5;
+  background: #0a0a0f;
+  color: #f5f5f7;
+  font-family: var(--font-poppins), sans-serif;
 }
+
+.gradient-text {
+  background: linear-gradient(135deg, #6D5EF6, #B15CF6, #FF6E6E);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gradient-btn {
+  background: linear-gradient(135deg, #6D5EF6, #B15CF6, #FF6E6E);
+}
+
+.card {
+  background: #14141c;
+  border: 1px solid #24242e;
+  border-radius: 20px;
+}
+
 @keyframes pulseBar {
   0%, 100% { transform: scaleY(1); opacity: 1; }
   50% { transform: scaleY(0.5); opacity: 0.6; }
 }
-
 @keyframes popIn {
   0% { transform: scale(0.6); opacity: 0; }
   60% { transform: scale(1.1); opacity: 1; }
   100% { transform: scale(1); opacity: 1; }
 }
-
-.animate-splash .bar {
-  transform-origin: center;
-  animation: pulseBar 0.6s ease-in-out infinite;
-}
+.animate-splash .bar { transform-origin: center; animation: pulseBar 0.6s ease-in-out infinite; }
 .animate-splash .bar1 { animation-delay: 0s; }
 .animate-splash .bar2 { animation-delay: 0.1s; }
 .animate-splash .bar3 { animation-delay: 0.2s; }
-.animate-splash .play {
-  transform-origin: center;
-  animation: popIn 0.5s ease-out 0.3s both;
-}
+.animate-splash .play { transform-origin: center; animation: popIn 0.5s ease-out 0.3s both; }
