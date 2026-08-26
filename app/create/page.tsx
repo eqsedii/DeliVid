@@ -258,14 +258,20 @@ const [sharing, setSharing] = useState(false);
               >
                 Download to Phone
               </a>
-              <a
-                href="https://www.youtube.com/upload"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 text-center bg-red-600 text-white px-4 py-3 rounded-xl font-semibold"
-              >
-                Upload to YouTube
-              </a>
+              <button
+  onClick={async () => {
+    setSharing(true);
+    const shared = await shareVideoToYoutube(videoUrl!, title);
+    setSharing(false);
+    if (!shared) {
+      window.open("https://www.youtube.com/upload", "_blank");
+    }
+  }}
+  disabled={sharing}
+  className="flex-1 flex items-center justify-center gap-2 text-center bg-red-600 text-white px-4 py-3 rounded-xl font-semibold disabled:opacity-60"
+>
+  {sharing ? <LogoSpinner size={16} /> : "Upload to YouTube"}
+</button>
             </div>
           </div>
         )}
