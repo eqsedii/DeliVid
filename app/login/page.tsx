@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import LogoSpinner from "@/components/LogoSpinner";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,10 +23,7 @@ export default function LoginPage() {
       if (error) setError(error.message);
       else router.push("/create");
     } else {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) setError(error.message);
       else router.push("/create");
     }
@@ -34,6 +32,7 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6">
+      <img src="/logo.svg" alt="DeliVid" className="h-10 mb-8" />
       <h1 className="text-3xl font-bold mb-6">
         {isSignUp ? "Create your account" : "Welcome back"}
       </h1>
@@ -45,7 +44,7 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 outline-none"
+          className="w-full p-3 rounded-lg bg-[#14141c] border border-[#24242e] outline-none focus:border-[#B15CF6] transition"
         />
         <input
           type="password"
@@ -54,7 +53,7 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
-          className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 outline-none"
+          className="w-full p-3 rounded-lg bg-[#14141c] border border-[#24242e] outline-none focus:border-[#B15CF6] transition"
         />
 
         {error && <p className="text-red-400 text-sm">{error}</p>}
@@ -62,9 +61,20 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-white text-black p-3 rounded-lg font-semibold hover:bg-gray-200 transition disabled:opacity-50"
+          className={`w-full flex items-center justify-center gap-2 gradient-btn text-white p-3 rounded-lg font-semibold transition disabled:opacity-60 ${
+            loading ? "glow-btn" : ""
+          }`}
         >
-          {loading ? "Please wait..." : isSignUp ? "Sign Up" : "Sign In"}
+          {loading ? (
+            <>
+              <LogoSpinner size={18} />
+              Please wait...
+            </>
+          ) : isSignUp ? (
+            "Sign Up"
+          ) : (
+            "Sign In"
+          )}
         </button>
       </form>
 
@@ -72,9 +82,7 @@ export default function LoginPage() {
         onClick={() => setIsSignUp(!isSignUp)}
         className="mt-4 text-sm text-gray-400 underline"
       >
-        {isSignUp
-          ? "Already have an account? Sign in"
-          : "No account? Sign up"}
+        {isSignUp ? "Already have an account? Sign in" : "No account? Sign up"}
       </button>
     </main>
   );
