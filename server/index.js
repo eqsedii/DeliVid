@@ -20,37 +20,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
-function findFontFile() {
-  const root = path.join(__dirname, "node_modules/roboto-fontface");
-  const stack = [root];
-  const candidates = [];
-
-  while (stack.length) {
-    const dir = stack.pop();
-    let entries;
-    try {
-      entries = fs.readdirSync(dir, { withFileTypes: true });
-    } catch {
-      continue;
-    }
-    for (const entry of entries) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        stack.push(full);
-      } else if (entry.name.toLowerCase().endsWith(".ttf")) {
-        candidates.push(full);
-      }
-    }
-  }
-
-  const regular = candidates.find((f) => /regular/i.test(f));
-  const chosen = regular || candidates[0];
-  if (!chosen) throw new Error("No .ttf font file found in roboto-fontface package");
-  console.log("Using font file:", chosen);
-  return chosen;
-}
-
-const FONT_FILE = findFontFile();
+const FONT_FILE = path.join(__dirname, "fonts/DejaVuSans.ttf");
 const FONT_BASE64 = fs.readFileSync(FONT_FILE).toString("base64");
 
 async function downloadTo(url, destPath) {
