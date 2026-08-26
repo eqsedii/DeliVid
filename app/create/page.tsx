@@ -1,5 +1,5 @@
 "use client";
-
+import { shareVideoToYoutube } from "@/lib/shareVideo";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -21,7 +21,7 @@ export default function CreatePage() {
   const [projectId, setProjectId] = useState<string | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [polling, setPolling] = useState(false);
-
+const [sharing, setSharing] = useState(false);
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (!data.user) router.push("/login");
